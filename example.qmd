@@ -1,0 +1,69 @@
+---
+title: "htimeline"
+subtitle: "Horizontal timelines for Reveal.js"
+lang: en
+format: revealjs
+filters:
+  - htimeline
+---
+
+## Overview
+
+::: {.htimeline .static}
+
+### Medieval period {date="V^th^--XV^th^ century"}
+
+### Early modern period {date="1492--1789"}
+
+### Late modern period {date="1789--1945"}
+
+### Contemporary period {date="1945--"}
+
+:::
+
+## Stepping through events
+
+::: {.htimeline}
+
+### Fall of Constantinople {date="1453-05-29"}
+
+The box under the line accepts **any markdown**: lists, callouts, code,
+figures… A lone image at the end goes into a column on the right.
+
+![](images/landmark.svg)
+
+### Storming of the Bastille {date="1789-07-14"}
+
+::: {.incremental}
+- Fragments *inside* a box
+- run before the next event
+:::
+
+### Revolutions of 1848 {date="1848-02--1848-06"}
+
+Month-only dates show the month above the year.
+
+### Today {date="2000--" date-detail="*ongoing*"}
+
+Open-ended ranges and a custom upper line with `date-detail`.
+
+:::
+
+## Options
+
+::: {.htimeline .show-all}
+
+### `.show-all` {date="1900"}
+
+All dates and titles are visible from the start, dimmed; each step
+highlights the next one.
+
+### `.static` {date="1950"}
+
+No steps at all, useful for an overview.
+
+### `.first-visible` {date="2000"}
+
+The first event is already shown when the slide opens.
+
+:::

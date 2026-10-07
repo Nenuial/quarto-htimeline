@@ -1,0 +1,215 @@
+/* htimeline – horizontal timeline for Reveal.js
+   Colors follow the Reveal theme; override the --htl-* variables to tune. */
+
+.reveal .htimeline {
+  --htl-accent: var(--r-link-color, #2a76dd);
+  --htl-ink: var(--r-main-color, #222);
+  --htl-bg: var(--r-background-color, #fff);
+  --htl-line: 3px;
+  --htl-marker: 18px;
+
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  grid-template-rows: auto calc(var(--htl-marker) + 12px) auto auto;
+  margin: 0.4em 0 0 0;
+  font-size: var(--htl-font-size, 0.78em);
+  line-height: 1.25;
+}
+
+/* ---- Axis ---------------------------------------------------------- */
+
+.reveal .htimeline > .htl-axis {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  align-self: center;
+  position: relative;
+  height: var(--htl-line);
+  margin-right: 14px;
+  background: var(--htl-ink);
+  border-radius: var(--htl-line);
+}
+
+.reveal .htimeline > .htl-axis::after {
+  content: "";
+  position: absolute;
+  right: -14px;
+  top: 50%;
+  translate: 0 -50%;
+  border-left: 16px solid var(--htl-ink);
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+}
+
+/* ---- Events -------------------------------------------------------- */
+
+/* The event wrapper is the Reveal fragment, but takes no layout of its own:
+   its children are placed directly in the grid. Visibility is handled on
+   the children below, so neutralise Reveal's fragment styles here. */
+.reveal .slides section .htimeline .htl-event,
+.reveal .slides section .htimeline .htl-event.fragment {
+  display: contents;
+  opacity: 1;
+  visibility: inherit;
+  transform: none;
+}
+
+.reveal .htimeline .htl-date,
+.reveal .htimeline .htl-marker,
+.reveal .htimeline .htl-title {
+  grid-column: var(--i);
+  transition: opacity 0.35s ease, translate 0.35s ease, scale 0.35s ease,
+    color 0.35s ease, background-color 0.35s ease, border-color 0.35s ease;
+}
+
+.reveal .htimeline .htl-date {
+  grid-row: 1;
+  align-self: end;
+  padding: 0 0.3em 0.2em;
+  text-align: center;
+}
+
+.reveal .htimeline .htl-date-main {
+  font-weight: 700;
+}
+
+.reveal .htimeline .htl-date-detail {
+  font-size: 0.68em;
+  opacity: 0.75;
+}
+
+.reveal .htimeline .htl-marker {
+  grid-row: 2;
+  align-self: center;
+  justify-self: center;
+  z-index: 1;
+  box-sizing: border-box;
+  width: var(--htl-marker);
+  height: var(--htl-marker);
+  border: 3px solid var(--htl-ink);
+  border-radius: 50%;
+  background: var(--htl-bg);
+}
+
+.reveal .htimeline .htl-title {
+  grid-row: 3;
+  align-self: start;
+  padding: 0.25em 0.4em 0;
+  text-align: center;
+  font-size: 0.8em;
+  font-weight: 600;
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+
+/* Not yet reached */
+.reveal .htimeline .htl-event.fragment:not(.visible) > :is(.htl-date, .htl-title) {
+  opacity: 0;
+  translate: 0 0.4em;
+}
+
+.reveal .htimeline .htl-event.fragment:not(.visible) > .htl-marker {
+  opacity: 0;
+  scale: 0.3;
+}
+
+.reveal .htimeline.show-all .htl-event.fragment:not(.visible) > :is(.htl-date, .htl-title, .htl-marker) {
+  opacity: 0.4;
+  translate: 0 0;
+  scale: 1;
+}
+
+/* Reached */
+.reveal .htimeline .htl-event.visible > .htl-marker {
+  background: var(--htl-ink);
+}
+
+/* Current step = the last reached event */
+.reveal .htimeline:not(.static)
+  .htl-event:is(.visible, :not(.fragment)):not(:has(~ .htl-event:is(.visible, :not(.fragment))))
+  > .htl-marker {
+  background: var(--htl-accent);
+  border-color: var(--htl-accent);
+  scale: 1.4;
+}
+
+.reveal .htimeline:not(.static)
+  .htl-event:is(.visible, :not(.fragment)):not(:has(~ .htl-event:is(.visible, :not(.fragment))))
+  > .htl-title {
+  color: var(--htl-accent);
+}
+
+/* ---- Boxes --------------------------------------------------------- */
+
+/* All boxes share one grid cell: the row takes the height of the tallest,
+   so nothing jumps between steps. Only the current one is shown. */
+.reveal .htimeline .htl-box {
+  grid-row: 4;
+  grid-column: 1 / -1;
+  align-self: start;
+  position: relative;
+  margin-top: 0.9em;
+  padding: 0.5em 0.8em;
+  border-top: 3px solid var(--htl-accent);
+  border-radius: 0 0 0.4em 0.4em;
+  background: color-mix(in srgb, var(--htl-ink) 8%, transparent);
+  font-size: var(--htl-box-font-size, 1em);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0.35s;
+}
+
+.reveal .htimeline
+  .htl-event:is(.visible, :not(.fragment)):not(:has(~ .htl-event:is(.visible, :not(.fragment))))
+  > .htl-box {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Pointer from the box up to its event */
+.reveal .htimeline .htl-box::before {
+  content: "";
+  position: absolute;
+  top: calc(-0.5em - 3px);
+  left: calc((var(--i) - 0.5) / var(--n) * 100%);
+  translate: -50% 0;
+  border: 0.5em solid transparent;
+  border-top: 0;
+  border-bottom-color: var(--htl-accent);
+}
+
+.reveal .htimeline .htl-event.smaller > .htl-box {
+  font-size: 0.85em;
+}
+
+.reveal .htimeline .htl-box > :first-child,
+.reveal .htimeline .htl-main > :first-child {
+  margin-top: 0;
+}
+
+.reveal .htimeline .htl-box > :last-child,
+.reveal .htimeline .htl-main > :last-child {
+  margin-bottom: 0;
+}
+
+.reveal .htimeline .htl-box.has-aside {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--htl-aside-width, 20%);
+  column-gap: 1em;
+  align-items: start;
+}
+
+.reveal .htimeline .htl-aside :is(p, figure, .quarto-figure) {
+  margin: 0;
+}
+
+.reveal .htimeline .htl-aside img {
+  display: block;
+  max-width: 100%;
+  max-height: 360px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+.reveal .htimeline .htl-aside.no-caption figcaption {
+  display: none;
+}

@@ -210,8 +210,9 @@ local function add_css()
   end
   quarto.doc.add_html_dependency({
     name = "htimeline",
-    version = "0.3.0",
+    version = "0.4.0",
     stylesheets = { "htimeline.css" },
+    scripts = { "htimeline.js" },
   })
   css_added = true
 end

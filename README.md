@@ -78,7 +78,7 @@ On the timeline div:
 | `.static`             | No steps; everything is shown at once                          |
 | `.first-visible`      | The first event is shown when the slide opens                  |
 | `rows="2"`            | Spread the events over several rows; the line snakes down, turning at the slide edges |
-| `box="side"`          | Boxes in a panel to the right of the timeline (default when `rows` > 1) |
+| `box="side"`          | Boxes in a panel to the right of the timeline (default when `rows` > 1); each box is centred on its row, with an arrow pointing at it, and pushed up or down to stay on the slide |
 | `box="below"`         | Boxes under the timeline (default with a single row)          |
 | `side-width="50%"`    | Width of the side panel (default `55%`)                        |
 | `aside-width="25%"`   | Width of the image column (default `20%`); `none` disables it  |
@@ -104,7 +104,9 @@ your theme or a CSS file:
 ```
 
 The current-event highlight relies on the CSS `:has()` selector, supported by
-all current browsers.
+all current browsers. Placing the side-panel boxes next to their row uses a
+small script; without it (e.g. in a PDF export) they sit at the top of the
+panel.
 
 ## Example
 

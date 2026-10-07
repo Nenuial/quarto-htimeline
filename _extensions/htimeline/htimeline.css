@@ -262,22 +262,33 @@
 
 /* ---- Boxes in a side panel (box="side", default with rows > 1) ----- */
 
-/* The panel spans all rows; the last row is flexible so that a tall box
-   grows it instead of stretching the rows of the timeline. */
+/* Boxes are positioned absolutely in the panel column, so they never
+   resize the rows of the timeline. htimeline.js centres each one on the
+   line of its row (--htl-box-top) and aims the arrow at it
+   (--htl-arrow-y); without the script they sit at the top. */
 .reveal .htimeline.htl-side {
   --htl-side-col: var(--htl-side-width, 55%);
-  grid-template-rows: repeat(var(--bands), auto var(--htl-axis-row) auto) 1fr;
+  position: relative;
 }
 
 .reveal .htimeline.htl-side .htl-box {
+  position: absolute;
   grid-row: 1 / -1;
   grid-column: -2 / -1;
-  margin: 0 0 0 1em;
+  top: var(--htl-box-top, 0px);
+  left: 0;
+  right: 0;
+  margin: 0 0 0 1.2em;
   border-top: 0;
   border-left: 3px solid var(--htl-accent);
   border-radius: 0 0.4em 0.4em 0;
 }
 
 .reveal .htimeline.htl-side .htl-box::before {
-  display: none;
+  top: var(--htl-arrow-y, 1em);
+  left: calc(-0.5em - 3px);
+  translate: 0 -50%;
+  border: 0.5em solid transparent;
+  border-left: 0;
+  border-right-color: var(--htl-accent);
 }

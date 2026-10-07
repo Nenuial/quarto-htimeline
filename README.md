@@ -108,6 +108,18 @@ all current browsers. Placing the side-panel boxes next to their row uses a
 small script; without it (e.g. in a PDF export) they sit at the top of the
 panel.
 
+## Converting old timelines
+
+[`tools/convert-timeline.py`](tools/convert-timeline.py) converts the vertical
+`.timeline` markup of
+[quarto-keynote](https://github.com/Nenuial/quarto-keynote) to this syntax:
+
+```bash
+python3 tools/convert-timeline.py index.qmd index.qmd
+```
+
+See the top of the script for the expected input.
+
 ## Example
 
 Here is the source code for a minimal example: [example.qmd](example.qmd).

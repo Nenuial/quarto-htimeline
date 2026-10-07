@@ -21,6 +21,24 @@ filters:
 
 :::
 
+## Several rows
+
+::: {.htimeline .show-all rows="3"}
+
+### Antiquity {date="--476"}
+
+### Middle Ages {date="476--1492"}
+
+### Renaissance {date="XV^th^--XVI^th^ century"}
+
+### Enlightenment {date="1685--1815"}
+
+### Industrial age {date="1760--1914"}
+
+### Contemporary age {date="1945--"}
+
+:::
+
 ## Stepping through events
 
 ::: {.htimeline}

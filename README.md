@@ -77,6 +77,7 @@ On the timeline div:
 | `.show-all`           | All dates and titles visible from the start (dimmed)           |
 | `.static`             | No steps; everything is shown at once                          |
 | `.first-visible`      | The first event is shown when the slide opens                  |
+| `rows="2"`            | Spread the events over several rows; the line snakes down, turning at the slide edges |
 | `aside-width="25%"`   | Width of the image column (default `20%`); `none` disables it  |
 
 On a heading: `aside-width="…"` for that event only, and `.smaller` for a
@@ -95,6 +96,7 @@ your theme or a CSS file:
   --htl-bg: #fff;             /* inside of the markers */
   --htl-font-size: 0.78em;    /* whole timeline */
   --htl-box-font-size: 1em;   /* boxes, relative to the timeline */
+  --htl-row-gap: 1.8em;       /* space between rows when rows > 1 */
 }
 ```
 

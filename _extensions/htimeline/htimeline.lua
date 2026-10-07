@@ -28,6 +28,8 @@ Options on the timeline div:
   .show-all       all dates/titles visible from the start (dimmed), steps highlight
   .static         no steps at all
   .first-visible  first event shown on slide entry
+  rows="2"        spread the events over several rows; the line snakes
+                  down from one row to the next
   aside-width="25%"  width of the side image column (also per heading);
                      aside-width="none" disables the side column
 ]]
@@ -178,7 +180,7 @@ local function make_box(body, aside_width)
   }, pandoc.Attr("", { "htl-box", "has-aside" }, { style = "--htl-aside-width:" .. aside_width }))
 end
 
-local function make_event(i, heading, body, step, defaults)
+local function make_event(pos, heading, body, step, defaults)
   local classes = { "htl-event" }
   if step then
     table.insert(classes, "fragment")
@@ -196,7 +198,7 @@ local function make_event(i, heading, body, step, defaults)
     local aside_width = heading.attributes["aside-width"] or defaults["aside-width"] or "20%"
     children:insert(make_box(body, aside_width))
   end
-  return pandoc.Div(children, pandoc.Attr("", classes, { style = "--i:" .. i }))
+  return pandoc.Div(children, pandoc.Attr("", classes, { style = pos }))
 end
 
 local function add_css()
@@ -205,7 +207,7 @@ local function add_css()
   end
   quarto.doc.add_html_dependency({
     name = "htimeline",
-    version = "0.1.0",
+    version = "0.2.0",
     stylesheets = { "htimeline.css" },
   })
   css_added = true
@@ -245,15 +247,48 @@ local function timeline(div)
   local defaults = { ["aside-width"] = div.attributes["aside-width"] }
   div.attributes["aside-width"] = nil
 
-  local content = pandoc.Blocks({ pandoc.Div({}, pandoc.Attr("", { "htl-axis" })) })
+  -- Layout: each row ("band") uses three grid rows (date, axis, title).
+  -- Grid columns 1 and cols + 2 are gutters holding the turns of the line.
+  -- Odd bands run right to left, so the line snakes down.
+  local bands = math.max(1, math.min(tonumber(div.attributes["rows"]) or 1, #events))
+  local cols = math.ceil(#events / bands)
+  bands = math.ceil(#events / cols)
+  div.attributes["rows"] = nil
+
+  local function axis_row(b)
+    return 3 * b + 2
+  end
+
+  local content = pandoc.Blocks({})
+  for b = 0, bands - 1 do
+    local classes = { "htl-axis" }
+    if b == bands - 1 then
+      table.insert(classes, b % 2 == 0 and "end-right" or "end-left")
+    end
+    content:insert(pandoc.Div({}, pandoc.Attr("", classes, { style = "--ra:" .. axis_row(b) })))
+    if b < bands - 1 then
+      content:insert(pandoc.Div({}, pandoc.Attr("", { "htl-turn", b % 2 == 0 and "right" or "left" }, {
+        style = "--ra:" .. axis_row(b) .. "; --re:" .. (axis_row(b + 1) + 1),
+      })))
+    end
+  end
+
   for i, ev in ipairs(events) do
+    local b, p = (i - 1) // cols, (i - 1) % cols
+    local c = (b % 2 == 0) and (p + 1) or (cols - p)
+    local pos = string.format("--c:%d; --gc:%d; --rd:%d; --ra:%d; --rt:%d",
+      c, c + 1, 3 * b + 1, 3 * b + 2, 3 * b + 3)
     local step = not static and not (first_visible and i == 1)
-    content:insert(make_event(i, ev.heading, ev.body, step, defaults))
+    content:insert(make_event(pos, ev.heading, ev.body, step, defaults))
   end
   div.content = content
 
+  if bands > 1 then
+    div.classes:insert("htl-serpentine")
+  end
   local style = div.attributes["style"]
-  div.attributes["style"] = "--n:" .. #events .. (style and ("; " .. style) or "")
+  div.attributes["style"] = string.format("--cols:%d; --bands:%d; --rb:%d", cols, bands, 3 * bands + 1)
+    .. (style and ("; " .. style) or "")
 
   add_css()
 

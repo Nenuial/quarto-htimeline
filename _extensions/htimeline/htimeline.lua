@@ -30,6 +30,9 @@ Options on the timeline div:
   .first-visible  first event shown on slide entry
   rows="2"        spread the events over several rows; the line snakes
                   down from one row to the next
+  box="side"      boxes in a panel to the right of the timeline (default
+                  when rows > 1); box="below" puts them under it
+  side-width="55%"  width of that panel
   aside-width="25%"  width of the side image column (also per heading);
                      aside-width="none" disables the side column
 ]]
@@ -207,7 +210,7 @@ local function add_css()
   end
   quarto.doc.add_html_dependency({
     name = "htimeline",
-    version = "0.2.0",
+    version = "0.3.0",
     stylesheets = { "htimeline.css" },
   })
   css_added = true
@@ -267,8 +270,10 @@ local function timeline(div)
     end
     content:insert(pandoc.Div({}, pandoc.Attr("", classes, { style = "--ra:" .. axis_row(b) })))
     if b < bands - 1 then
-      content:insert(pandoc.Div({}, pandoc.Attr("", { "htl-turn", b % 2 == 0 and "right" or "left" }, {
-        style = "--ra:" .. axis_row(b) .. "; --re:" .. (axis_row(b + 1) + 1),
+      local right = b % 2 == 0
+      content:insert(pandoc.Div({}, pandoc.Attr("", { "htl-turn", right and "right" or "left" }, {
+        style = string.format("--ra:%d; --re:%d; --tc:%d",
+          axis_row(b), axis_row(b + 1) + 1, right and cols + 2 or 1),
       })))
     end
   end
@@ -286,9 +291,24 @@ local function timeline(div)
   if bands > 1 then
     div.classes:insert("htl-serpentine")
   end
-  local style = div.attributes["style"]
-  div.attributes["style"] = string.format("--cols:%d; --bands:%d; --rb:%d", cols, bands, 3 * bands + 1)
-    .. (style and ("; " .. style) or "")
+
+  local has_box = false
+  for _, ev in ipairs(events) do
+    has_box = has_box or #ev.body > 0
+  end
+  local box = div.attributes["box"] or (bands > 1 and "side" or "below")
+  local style = string.format("--cols:%d; --bands:%d; --rb:%d", cols, bands, 3 * bands + 1)
+  if has_box and box == "side" then
+    div.classes:insert("htl-side")
+    if div.attributes["side-width"] then
+      style = style .. "; --htl-side-width:" .. div.attributes["side-width"]
+    end
+  end
+  div.attributes["box"] = nil
+  div.attributes["side-width"] = nil
+
+  local user_style = div.attributes["style"]
+  div.attributes["style"] = style .. (user_style and ("; " .. user_style) or "")
 
   add_css()
 

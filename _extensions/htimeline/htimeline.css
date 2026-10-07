@@ -12,7 +12,8 @@
 
   display: grid;
   grid-template-columns:
-    var(--htl-gutter-w) repeat(var(--cols), minmax(0, 1fr)) var(--htl-gutter-w);
+    var(--htl-gutter-w) repeat(var(--cols), minmax(0, 1fr)) var(--htl-gutter-w)
+    var(--htl-side-col, 0px);
   grid-template-rows: repeat(var(--bands), auto var(--htl-axis-row) auto) auto;
   margin: 0.4em 0 0 0;
   font-size: var(--htl-font-size, 0.78em);
@@ -23,7 +24,7 @@
 
 .reveal .htimeline > .htl-axis {
   grid-row: var(--ra);
-  grid-column: 2 / -2;
+  grid-column: 2 / span var(--cols);
   align-self: center;
   position: relative;
   height: var(--htl-line);
@@ -69,19 +70,18 @@
    Its top and bottom borders line up with the centres of the two axes. */
 .reveal .htimeline > .htl-turn {
   grid-row: var(--ra) / var(--re);
+  grid-column: var(--tc);
   box-sizing: border-box;
   margin-block: calc((var(--htl-axis-row) - var(--htl-line)) / 2);
   border: var(--htl-line) solid var(--htl-ink);
 }
 
 .reveal .htimeline > .htl-turn.right {
-  grid-column: -2 / -1;
   border-left: 0;
   border-radius: 0 var(--htl-gutter-w) var(--htl-gutter-w) 0;
 }
 
 .reveal .htimeline > .htl-turn.left {
-  grid-column: 1 / 2;
   border-right: 0;
   border-radius: var(--htl-gutter-w) 0 0 var(--htl-gutter-w);
 }
@@ -190,7 +190,7 @@
    so nothing jumps between steps. Only the current one is shown. */
 .reveal .htimeline .htl-box {
   grid-row: var(--rb);
-  grid-column: 2 / -2;
+  grid-column: 2 / span var(--cols);
   align-self: start;
   position: relative;
   margin-top: 0.9em;
@@ -257,5 +257,27 @@
 }
 
 .reveal .htimeline .htl-aside.no-caption figcaption {
+  display: none;
+}
+
+/* ---- Boxes in a side panel (box="side", default with rows > 1) ----- */
+
+/* The panel spans all rows; the last row is flexible so that a tall box
+   grows it instead of stretching the rows of the timeline. */
+.reveal .htimeline.htl-side {
+  --htl-side-col: var(--htl-side-width, 55%);
+  grid-template-rows: repeat(var(--bands), auto var(--htl-axis-row) auto) 1fr;
+}
+
+.reveal .htimeline.htl-side .htl-box {
+  grid-row: 1 / -1;
+  grid-column: -2 / -1;
+  margin: 0 0 0 1em;
+  border-top: 0;
+  border-left: 3px solid var(--htl-accent);
+  border-radius: 0 0.4em 0.4em 0;
+}
+
+.reveal .htimeline.htl-side .htl-box::before {
   display: none;
 }

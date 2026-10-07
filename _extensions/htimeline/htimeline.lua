@@ -35,6 +35,12 @@ Options on the timeline div:
   side-width="55%"  width of that panel
   aside-width="25%"  width of the side image column (also per heading);
                      aside-width="none" disables the side column
+
+Document-wide defaults (front matter or _quarto.yml):
+  htimeline:
+    first-visible: true
+    show-all: true
+  A timeline opts out with first-visible="false" / show-all="false".
 ]]
 
 local MONTHS = {
@@ -50,6 +56,18 @@ local MONTHS = {
 
 local lang = "fr"
 local css_added = false
+local doc_defaults = {} -- from the `htimeline` metadata key
+
+-- An option set on the div (class, or attribute "true"/"false"),
+-- falling back to the document-wide default.
+local function flag(div, name)
+  local value = div.attributes[name]
+  div.attributes[name] = nil
+  if value ~= nil then
+    return value ~= "false"
+  end
+  return div.classes:includes(name) or doc_defaults[name] == true
+end
 
 local function trim(s)
   return (s:gsub("^%s+", ""):gsub("%s+$", ""))
@@ -210,7 +228,7 @@ local function add_css()
   end
   quarto.doc.add_html_dependency({
     name = "htimeline",
-    version = "0.4.0",
+    version = "0.5.0",
     stylesheets = { "htimeline.css" },
     scripts = { "htimeline.js" },
   })
@@ -247,7 +265,15 @@ local function timeline(div)
   end
 
   local static = div.classes:includes("static")
-  local first_visible = div.classes:includes("first-visible")
+  local first_visible = flag(div, "first-visible")
+  -- .show-all is applied by the stylesheet, so keep the class in sync
+  local show_all = flag(div, "show-all")
+  div.classes = div.classes:filter(function(c)
+    return c ~= "show-all"
+  end)
+  if show_all then
+    div.classes:insert("show-all")
+  end
   local defaults = { ["aside-width"] = div.attributes["aside-width"] }
   div.attributes["aside-width"] = nil
 
@@ -327,6 +353,15 @@ return {
         local l = pandoc.utils.stringify(meta.lang):lower():match("^(%a+)")
         if l then
           lang = l
+        end
+      end
+      local opts = meta.htimeline
+      if type(opts) == "table" then
+        for _, name in ipairs({ "first-visible", "show-all" }) do
+          local v = opts[name]
+          if v ~= nil then
+            doc_defaults[name] = (v == true) or (pandoc.utils.stringify(v) == "true")
+          end
         end
       end
     end,

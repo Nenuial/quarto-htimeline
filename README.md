@@ -86,6 +86,17 @@ On the timeline div:
 On a heading: `aside-width="…"` for that event only, and `.smaller` for a
 smaller font in its box.
 
+`first-visible` and `show-all` can also be set for a whole document (or a
+project, in `_quarto.yml`):
+
+```yaml
+htimeline:
+  first-visible: true
+  show-all: true
+```
+
+A timeline then opts out with `first-visible="false"` or `show-all="false"`.
+
 ### Styling
 
 Colors come from the Reveal theme (`$body-color`, `$link-color`, `$body-bg`),
